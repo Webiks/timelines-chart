@@ -34,7 +34,7 @@ export default Kapsule({
       });
 
     // Build dom
-    state.svg = d3Select(el).append('svg').attr('class', 'brusher');
+    state.svg = d3Select(el).append('svg').attr('class', 'brusher').attr('direction', 'rtl')
     const brusher = state.svg.append('g').attr('class', 'brusher-margins');
     brusher.append('rect').attr('class', 'grid-background');
     brusher.append('g').attr('class', 'x grid');

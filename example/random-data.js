@@ -19,7 +19,7 @@ function getRandomData(ordinal = false) {
   function getGroupData() {
 
     return [...Array(Math.ceil(Math.random()*MAXLINES)).keys()].map(i => ({
-      label: 'label' + (i+1),
+      label: 'label' + (i+ 'עידו'),
       data: getSegmentsData()
     }));
 

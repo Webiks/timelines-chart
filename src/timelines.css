@@ -17,6 +17,9 @@
 
     .x-axis {
       font: 12px sans-serif;
+      text {
+          fill: white;
+      }
     }
 
     .x-grid line {
@@ -28,7 +31,7 @@
         stroke: none;
       }
       text {
-        fill: black;
+        fill: white;
       }
     }
   }

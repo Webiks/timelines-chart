@@ -361,7 +361,7 @@ export default Kapsule({
         const elem = d3Select(el)
             .attr('class', 'timelines-chart');
 
-        state.svg = elem.append('svg');
+        state.svg = elem.append('svg').attr('direction', 'ltr');
         state.overviewAreaElem = elem.append('div');
 
         // Initialize scales and axes
@@ -494,6 +494,7 @@ export default Kapsule({
 
             state.lineTooltip = d3Tip()
                 .attr('class', 'chart-tooltip line-tooltip')
+                .style('visibility', 'hidden')
                 .direction('e')
                 .offset([0, 0])
                 .html(d => {
@@ -512,7 +513,7 @@ export default Kapsule({
                     const normVal = state.zColorScale.domain()[state.zColorScale.domain().length - 1] - state.zColorScale.domain()[0];
                     const dateFormat = (state.useUtc ? d3UtcFormat : d3TimeFormat)(`${state.timeFormat}${state.useUtc ? ' (UTC)' : ''}`);
                     return '<strong>' + d.labelVal + ' </strong>' + state.zDataLabel
-                        + (normVal ? ' (<strong>' + Math.round((d.val - state.zColorScale.domain()[0]) / normVal * 100 * 100) / 100 + '%</strong>)' : '') + '<br>'
+                        + (false ? ' (<strong>' + Math.round((d.val - state.zColorScale.domain()[0]) / normVal * 100 * 100) / 100 + '%</strong>)' : '') + '<br>'
                         + '<strong>From: </strong>' + dateFormat(d.timeRange[0]) + '<br>'
                         + '<strong>To: </strong>' + dateFormat(d.timeRange[1]);
                 });
@@ -888,7 +889,7 @@ export default Kapsule({
             state.svg.select('g.y-axis')
                 .transition().duration(state.transDuration)
                 .attr('transform', 'translate(' + 0 + ', 0)')
-                .style('font-size', fontSize + 'px')
+                .style('font-size', state.nLines< 14? '20px' : fontSize +'px')
                 .call(state.yAxis);
 
             const ticks = state.svg.select('g.y-axis').selectAll('.tick')
@@ -899,35 +900,46 @@ export default Kapsule({
                 }
                 return 200
             })
-            setTimeout(() => {
-                ticks.selectAll('rect').remove()
-                ticks.append("rect")
-                    .attr("width", function (d) {
-
-                        return this.parentElement.getBBox().width
-                    })
-                    .attr("height", function (d) {
-                        return this.parentElement.getBBox().height
-                    })
-                    .attr('transform', function (d) {
-
-                        return `translate(${-this.parentElement.getBBox().width / 2}, ${-this.parentElement.getBBox().height / 2})`
-                    })
-                    .style("fill", (d) => {
-
-                        if (d && state.labelRule && state.labelRule.values && state.labelRule.field && d[state.labelRule.field]) {
-                            return state.labelRule.values[state.labelRule.field]
-                        }
-                        return 'transparent'
-                    })
-                ticks.each(function () {
-                    var firstChild = this.parentNode.firstChild;
-                    if (firstChild) {
-                        this.parentNode.insertBefore(this, firstChild);
-                    }
-                });
-
-            }, 200)
+            // setTimeout(() => {
+            //     ticks.selectAll('rect').remove()
+            //     ticks.append("rect")
+            //         .attr("width", function (d) {
+            //
+            //             return this.parentElement.getBBox().width
+            //         })
+            //         .attr("height", function (d) {
+            //             return this.parentElement.getBBox().height
+            //         })
+            //         .attr('transform', function (d) {
+            //
+            //             return `translate(${-this.parentElement.getBBox().width / 2}, ${-this.parentElement.getBBox().height / 2})`
+            //         })
+            //         .style("fill", (d) => {
+            //             const numberOfTimeSlashApper = d.replace(/[^'ע']/g, "").length;
+            //             switch (numberOfTimeSlashApper) {
+            //                 case 2:
+            //                     return 'rgba(55,55,55,0.6)';
+            //                 case 1:
+            //                     return 'rgba(55,55,55,0.3)';
+            //                 case 0:
+            //                     return 'rgba(55,55,55,0.1)'
+            //                 default:
+            //                     return 'transparent'
+            //             }
+            //             // if (d.includes(''))
+            //             // if (d && state.labelRule && state.labelRule.values && state.labelRule.field && d[state.labelRule.field]) {
+            //             //     return state.labelRule.values[state.labelRule.field]
+            //             // }
+            //             // return 'transparent'
+            //         })
+            //     ticks.each(function () {
+            //         var firstChild = this.parentNode.firstChild;
+            //         if (firstChild) {
+            //             this.parentNode.insertBefore(this, firstChild);
+            //         }
+            //     });
+            //
+            // }, 200)
 
             // Grp
             const minHeight = d3Min(state.grpScale.range(), function (d, i) {
