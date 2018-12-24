@@ -396,7 +396,7 @@ export default Kapsule({
             axises.append('g').attr('class', 'y-axis')
 
             state.yAxis.scale(state.yScale)
-                .tickSize(0);
+                .tickSize(20);
 
 
             state.colorLegend = ColorLegend()
@@ -469,6 +469,7 @@ export default Kapsule({
                     }
                 });
             }
+
         }
 
         function addTooltips() {
@@ -592,6 +593,9 @@ export default Kapsule({
                                 }
                             });
                         }
+
+
+
                     }, true);
 
                 d3Event.stopPropagation();
@@ -802,6 +806,10 @@ export default Kapsule({
 
             state.yScale.domain(labels);
             state.yScale.range([state.graphH / labels.length * 0.5, state.graphH * (1 - 0.5 / labels.length)]);
+
+
+
+
         }
 
         function adjustGrpScale() {
@@ -845,7 +853,7 @@ export default Kapsule({
             state.svg.select('.axises')
                 .attr('transform', 'translate(' + state.leftMargin + ',' + state.topMargin + ')');
 
-            // X
+            // X.
             state.xAxis
                 .scale(state.xScale)
                 .ticks(Math.round(state.graphW * 0.0011))
@@ -879,8 +887,19 @@ export default Kapsule({
             // Y
             const fontVerticalMargin = 0.6;
             const labelDisplayRatio = Math.ceil(state.nLines * state.minLabelFont / Math.sqrt(2) / state.graphH / fontVerticalMargin);
-            const tickVals = state.yScale.domain().filter((d, i) => !(i % labelDisplayRatio));
-            let fontSize = Math.min(12, state.graphH / tickVals.length * fontVerticalMargin * Math.sqrt(2));
+            const tickVals = state.yScale.domain()
+                .filter((d, i) => !(i % labelDisplayRatio))
+                // .map(d => {
+                //     console.log("Fsdfds")
+                //     let spaceStr = '';
+                //     const requiredLength = (maxChars - d.length) / 2;
+                //     for (var i = 0; i < requiredLength; i++) {
+                //         spaceStr.concat(' ')
+                //     };
+                //     return spaceStr + d + spaceStr
+                // });
+
+            let fontSize = 12 || Math.min(12, state.graphH / tickVals.length * fontVerticalMargin * Math.sqrt(2));
             let maxChars = Math.ceil(state.rightMargin / (fontSize / Math.sqrt(2)));
 
             state.yAxis.tickValues(tickVals);
@@ -889,17 +908,55 @@ export default Kapsule({
             state.svg.select('g.y-axis')
                 .transition().duration(state.transDuration)
                 .attr('transform', 'translate(' + 0 + ', 0)')
-                .style('font-size', state.nLines< 14? '20px' : fontSize +'px')
+                .style('font-size', 12) // state.nLines < 14 ? '20px' : fontSize + 'px')
                 .call(state.yAxis);
 
-            const ticks = state.svg.select('g.y-axis').selectAll('.tick')
 
-            ticks.attr('font-weight', (d) => {
-                if (d && state.boldRule && state.boldRule.values && state.boldRule.field && d[state.boldRule.field]) {
-                    return state.boldRule.values[state.boldRule.field]
-                }
-                return 200
-            })
+            const ticks = state.svg.select('g.y-axis').selectAll('.tick')
+            setTimeout(() => {
+
+                ticks
+                    .attr('font-weight', (d) => {
+                        switch (d.replace(/[^/]/g, "").length) {
+                            case 0:
+                                return '900';
+                            case 1:
+                                return '400';
+                            default:
+                                return '100'
+                        }
+                        // if (d && state.boldRule && state.boldRule.values && state.boldRule.field && d[state.boldRule.field]) {
+                        //     return state.boldRule.values[state.boldRule.field]
+                        // }
+                    })
+                    .attr('font-style', (d) => {
+                        switch (d.replace(/[^/]/g, "").length) {
+                            case 2:
+                                return 'italic';
+                            default:
+                                return 'normal'
+                        }
+                    })
+
+                // .attr('class', d => d.replace(/[0-9]/g, '').replace(/\//g, '').replace(/-/g, '').replace(/ /g, '').replace(/\+/g, '').replace(/\&/g, ''))
+            } ,500)
+
+            // setTimeout(() => {
+            //     ticks
+            //         .each(function (d, i, eleme) {
+            //             var tick = state.svg.select('.' + d.replace(/[0-9]/g, '').replace(/\//g, '').replace(/-/g, '').replace(/ /g, '').replace(/\+/g, '').replace(/\&/g, '')),
+            //                 text = tick.select('text'),
+            //                 bBox = text.node().getBBox();
+            //             tick.insert('rect', ':first-child')
+            //                 .attr('x', bBox.x - 3)
+            //                 .attr('y', bBox.y - 3)
+            //                 .attr('height', bBox.height + 6)
+            //                 .attr('width', bBox.width + 6)
+            //                 .style('fill', 'red');
+            //         })
+            // }, 500)
+
+
             // setTimeout(() => {
             //     ticks.selectAll('rect').remove()
             //     ticks.append("rect")
@@ -942,9 +999,10 @@ export default Kapsule({
             // }, 200)
 
             // Grp
-            const minHeight = d3Min(state.grpScale.range(), function (d, i) {
-                return i > 0 ? d - state.grpScale.range()[i - 1] : d * 2;
-            });
+            const
+                minHeight = d3Min(state.grpScale.range(), function (d, i) {
+                    return i > 0 ? d - state.grpScale.range()[i - 1] : d * 2;
+                });
             fontSize = Math.min(14, minHeight * fontVerticalMargin * Math.sqrt(2));
             maxChars = Math.floor(state.leftMargin / (fontSize / Math.sqrt(2)));
 
