@@ -154,6 +154,8 @@ export default Kapsule({
 
         // Callbacks
         onZoom: {}, // When user zooms in / resets zoom. Returns ([startX, endX], [startY, endY])
+        onZoomEnd: {},
+        renderTooltip: {},
         onLabelClick: {} // When user clicks on a group or y label. Returns (group) or (label, group) respectively
     },
 
@@ -511,6 +513,9 @@ export default Kapsule({
                 .direction('s')
                 .offset([5, 0])
                 .html(d => {
+                    if (state.renderTooltip) {
+                        return state.renderTooltip(d);
+                    }
                     const normVal = state.zColorScale.domain()[state.zColorScale.domain().length - 1] - state.zColorScale.domain()[0];
                     const dateFormat = (state.useUtc ? d3UtcFormat : d3TimeFormat)(`${state.timeFormat}${state.useUtc ? ' (UTC)' : ''}`);
                     return '<strong>' + d.labelVal + ' </strong>' + state.zDataLabel
@@ -640,6 +645,12 @@ export default Kapsule({
 
                 state._rerender();
                 if (state.onZoom) state.onZoom(state.zoomX, state.zoomY);
+
+                if(state.onZoomEnd) {
+                    setTimeout(() => {
+                        state.onZoomEnd(state.zoomX, state.zoomY)
+                    }, state.transDuration)
+                }
             });
 
             state.svg.on('resetZoom', function () {
@@ -673,6 +684,12 @@ export default Kapsule({
                 }
 
                 if (state.onZoom) state.onZoom(null, null);
+
+                if(state.onZoomEnd) {
+                    setTimeout(() => {
+                      state.onZoomEnd(state.zoomX, state.zoomY)
+                    }, state.transDuration)
+                }
             });
         }
     },
